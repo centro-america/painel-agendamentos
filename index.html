@@ -23,7 +23,13 @@
     h2 {
       text-align: center;
       color: var(--azul);
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
     }
 
     table {
@@ -54,13 +60,11 @@
     button {
       background-color: var(--azul);
       color: white;
-      padding: 12px 20px;
+      padding: 10px 18px;
       border: none;
       border-radius: 5px;
-      font-size: 16px;
+      font-size: 15px;
       cursor: pointer;
-      display: block;
-      margin: 20px auto;
       transition: background-color 0.3s;
     }
 
@@ -92,6 +96,11 @@
 </head>
 <body>
   <h2>Painel de Agendamentos</h2>
+
+  <div class="top-bar">
+    <button id="btn-download">Baixar Planilha</button>
+  </div>
+
   <table id="tabela-agendamentos">
     <thead>
       <tr>
@@ -103,7 +112,6 @@
     </thead>
     <tbody></tbody>
   </table>
-  <button id="btn-download">Baixar Planilha</button>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
