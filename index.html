@@ -16,7 +16,7 @@
   <table id="tabela-agendamentos">
     <thead>
       <tr>
-        <th>Nome</th>
+        <th>Responsável</th>
         <th>Aluno</th>
         <th>Turma</th>
         <th>Horário</th>
@@ -52,7 +52,7 @@
         const data = doc.data();
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${data.nome}</td>
+          <td>${data.nome}</td> <!-- 'nome' no Firebase é o responsável -->
           <td>${data.aluno}</td>
           <td>${data.turma}</td>
           <td>${data.horario}</td>
@@ -69,7 +69,7 @@
     }
 
     function downloadCSV() {
-      const rows = [["Nome", "Aluno", "Turma", "Horário"]];
+      const rows = [["Responsável", "Aluno", "Turma", "Horário"]];
       const trs = document.querySelectorAll("#tabela-agendamentos tbody tr");
       trs.forEach(tr => {
         const cols = tr.querySelectorAll("td");
