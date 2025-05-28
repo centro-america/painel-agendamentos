@@ -62,7 +62,10 @@
     }
 
     function escapeCSV(value) {
-      return `"${String(value).replace(/"/g, '""')}"`; // Aspas duplas escapadas
+      if (value.includes(",") || value.includes(";") || value.includes('"')) {
+        return `"${value.replace(/"/g, '""')}"`;
+      }
+      return value;
     }
 
     function downloadCSV() {
@@ -76,7 +79,8 @@
       });
 
       const csvContent = rows.map(e => e.join(";")).join("\n");
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const utf8BOM = '\uFEFF'; // Corrige os acentos no Excel
+      const blob = new Blob([utf8BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -86,6 +90,7 @@
     }
 
     document.getElementById("btn-download").addEventListener("click", downloadCSV);
+
     carregarAgendamentos();
   </script>
 </body>
