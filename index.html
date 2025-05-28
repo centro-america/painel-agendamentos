@@ -22,18 +22,18 @@
 
     .header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       margin-bottom: 20px;
       flex-wrap: wrap;
     }
 
-    h2 {
-      flex: 1 1 100%;
+    .titulo {
+      flex: 1;
       text-align: center;
       font-size: 28px;
       color: var(--azul);
-      margin-bottom: 10px;
+      margin: 0;
     }
 
     #btn-download {
@@ -45,8 +45,6 @@
       font-size: 15px;
       cursor: pointer;
       transition: background-color 0.3s;
-      align-self: flex-start;
-      margin-left: auto;
     }
 
     #btn-download:hover {
@@ -79,16 +77,25 @@
     }
 
     @media (max-width: 600px) {
+      .header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .titulo {
+        margin-bottom: 10px;
+        text-align: center;
+      }
+
       #btn-download {
-        width: 100%;
-        margin-left: 0;
+        align-self: flex-end;
       }
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <h2>Painel de Agendamentos</h2>
+    <h2 class="titulo">Painel de Agendamentos</h2>
     <button id="btn-download">Baixar Planilha</button>
   </div>
 
@@ -163,13 +170,10 @@
       const a = document.createElement('a');
       a.href = url;
       a.download = 'agendamentos.csv';
-      a.rel = 'noopener';
       document.body.appendChild(a);
-      setTimeout(() => {
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 0);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     document.getElementById("btn-download").addEventListener("click", downloadCSV);
