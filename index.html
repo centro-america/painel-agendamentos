@@ -176,8 +176,13 @@
       const a = document.createElement('a');
       a.href = url;
       a.download = 'agendamentos.csv';
-      a.click();
-      URL.revokeObjectURL(url);
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      setTimeout(() => {
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 0);
     }
 
     document.getElementById("btn-download").addEventListener("click", downloadCSV);
