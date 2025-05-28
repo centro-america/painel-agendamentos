@@ -25,25 +25,18 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
-      position: relative;
-    }
-
-    .titulo-container {
-      position: absolute;
-      left: 0;
-      right: 0;
-      text-align: center;
-      pointer-events: none;
+      flex-wrap: wrap;
     }
 
     h2 {
-      margin: 0;
+      flex: 1 1 100%;
+      text-align: center;
       font-size: 28px;
       color: var(--azul);
-      pointer-events: auto;
+      margin-bottom: 10px;
     }
 
-    button {
+    #btn-download {
       background-color: var(--azul);
       color: white;
       padding: 10px 18px;
@@ -52,9 +45,11 @@
       font-size: 15px;
       cursor: pointer;
       transition: background-color 0.3s;
+      align-self: flex-start;
+      margin-left: auto;
     }
 
-    button:hover {
+    #btn-download:hover {
       background-color: var(--azul-escuro);
     }
 
@@ -84,24 +79,16 @@
     }
 
     @media (max-width: 600px) {
-      .header {
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .titulo-container {
-        position: static;
-        text-align: center;
-        margin-bottom: 10px;
+      #btn-download {
+        width: 100%;
+        margin-left: 0;
       }
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <div class="titulo-container">
-      <h2>Painel de Agendamentos</h2>
-    </div>
+    <h2>Painel de Agendamentos</h2>
     <button id="btn-download">Baixar Planilha</button>
   </div>
 
