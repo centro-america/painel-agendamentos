@@ -61,17 +61,21 @@
       });
     }
 
+    function escapeCSV(value) {
+      return `"${String(value).replace(/"/g, '""')}"`; // Aspas duplas escapadas
+    }
+
     function downloadCSV() {
       const rows = [["Nome", "Aluno", "Turma", "Horário"]];
       const trs = document.querySelectorAll("#tabela-agendamentos tbody tr");
       trs.forEach(tr => {
         const cols = tr.querySelectorAll("td");
         const row = [];
-        cols.forEach(td => row.push(td.textContent));
+        cols.forEach(td => row.push(escapeCSV(td.textContent)));
         rows.push(row);
       });
 
-      const csvContent = rows.map(e => e.join(",")).join("\n");
+      const csvContent = rows.map(e => e.join(";")).join("\n");
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -82,7 +86,6 @@
     }
 
     document.getElementById("btn-download").addEventListener("click", downloadCSV);
-
     carregarAgendamentos();
   </script>
 </body>
