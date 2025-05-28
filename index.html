@@ -5,8 +5,8 @@
   <title>Painel de Agendamentos</title>
   <style>
     :root {
-      --verde: #28a745;
-      --verde-escuro: #218838;
+      --azul: #007bff;
+      --azul-escuro: #0056b3;
       --cinza-claro: #f8f9fa;
       --cinza-borda: #dee2e6;
       --fonte: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -22,7 +22,7 @@
 
     h2 {
       text-align: center;
-      color: var(--verde);
+      color: var(--azul);
       margin-bottom: 30px;
     }
 
@@ -42,8 +42,8 @@
     }
 
     th {
-      background-color: #e9f5ec;
-      color: #2d6a4f;
+      background-color: #e0ecf9;
+      color: #0b3d91;
       font-weight: bold;
     }
 
@@ -52,7 +52,7 @@
     }
 
     button {
-      background-color: var(--verde);
+      background-color: var(--azul);
       color: white;
       padding: 12px 20px;
       border: none;
@@ -65,7 +65,7 @@
     }
 
     button:hover {
-      background-color: var(--verde-escuro);
+      background-color: var(--azul-escuro);
     }
 
     @media (max-width: 600px) {
@@ -103,7 +103,7 @@
     </thead>
     <tbody></tbody>
   </table>
-  <button id="btn-download">📥 Baixar CSV</button>
+  <button id="btn-download">📥 Baixar Planilha</button>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
