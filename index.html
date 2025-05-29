@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>Painel de Agendamentos</title>
   <style>
-    /* Seu CSS intacto */
     :root {
       --azul: #007bff;
       --azul-escuro: #0056b3;
@@ -124,7 +123,7 @@
     <tbody></tbody>
   </table>
 
-  <!-- Biblioteca SheetJS para geração XLSX -->
+  <!-- Biblioteca SheetJS para gerar XLSX -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
   <script type="module">
@@ -144,6 +143,16 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // Função para garantir formato HH:mm com zeros à esquerda
+    function formatarHorario(horario) {
+      if (!horario) return "";
+      const parts = horario.split(":");
+      if (parts.length !== 2) return horario;
+      const h = parts[0].padStart(2, "0");
+      const m = parts[1].padStart(2, "0");
+      return `${h}:${m}`;
+    }
+
     async function carregarAgendamentos() {
       const snapshot = await getDocs(collection(db, "agendamentos"));
       const tbody = document.querySelector("#tabela-agendamentos tbody");
@@ -154,9 +163,9 @@
         const tr = document.createElement("tr");
         tr.innerHTML = 
           `<td>${data.nome}</td>
-          <td>${data.aluno}</td>
-          <td>${data.turma}</td>
-          <td>${data.horario}</td>`;
+           <td>${data.aluno}</td>
+           <td>${data.turma}</td>
+           <td>${formatarHorario(data.horario)}</td>`;
         tbody.appendChild(tr);
       });
     }
@@ -164,18 +173,25 @@
     function downloadXLSX() {
       const table = document.getElementById("tabela-agendamentos");
       const wb = XLSX.utils.book_new();
-
-      // Converte a tabela HTML para worksheet
       const ws = XLSX.utils.table_to_sheet(table);
 
-      // Pega o range total da tabela
       const range = XLSX.utils.decode_range(ws['!ref']);
-      // Aplica filtro só na coluna "Turma" (coluna C, índice 2), da linha 1 até a última linha
+
+      // Aplica filtro só na coluna "Turma" (coluna C, índice 2)
       const filtroRange = {
-        s: { c: 2, r: 0 },           // coluna C (índice 2), linha 1 (índice 0)
-        e: { c: 2, r: range.e.r }    // coluna C, última linha da tabela
+        s: { c: 2, r: 0 },
+        e: { c: 2, r: range.e.r }
       };
       ws['!autofilter'] = { ref: XLSX.utils.encode_range(filtroRange) };
+
+      // Define a coluna "Horário" (índice 3) como texto para evitar formatação automática
+      for (let row = 1; row <= range.e.r; row++) { // começa em 1 para pular cabeçalho
+        const cell_address = XLSX.utils.encode_cell({ c: 3, r: row });
+        if (!ws[cell_address]) continue;
+        ws[cell_address].z = '@'; // força formato texto no Excel
+        // Também força o tipo para string, evitando a conversão numérica
+        ws[cell_address].t = 's';
+      }
 
       XLSX.utils.book_append_sheet(wb, ws, "Agendamentos");
       XLSX.writeFile(wb, "agendamentos_filtrado.xlsx");
