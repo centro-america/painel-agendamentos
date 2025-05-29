@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Painel de Agendamentos</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     :root {
       --azul: #007bff;
@@ -11,7 +12,6 @@
       --cinza-borda: #dee2e6;
       --fonte: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
-
     body {
       font-family: var(--fonte);
       margin: 0;
@@ -19,13 +19,11 @@
       background-color: var(--cinza-claro);
       color: #333;
     }
-
     .header {
       position: relative;
       margin-bottom: 20px;
       height: 60px;
     }
-
     .titulo {
       position: absolute;
       left: 50%;
@@ -35,13 +33,11 @@
       font-size: 28px;
       color: var(--azul);
     }
-
     .botao-container {
       position: absolute;
       top: 0;
       right: 0;
     }
-
     button {
       background-color: var(--azul);
       color: white;
@@ -52,11 +48,9 @@
       cursor: pointer;
       transition: background-color 0.3s;
     }
-
     button:hover {
       background-color: var(--azul-escuro);
     }
-
     table {
       border-collapse: collapse;
       width: 100%;
@@ -65,23 +59,19 @@
       overflow: hidden;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-
     th, td {
       border: 1px solid var(--cinza-borda);
       padding: 12px 16px;
       text-align: left;
     }
-
     th {
       background-color: #e0ecf9;
       color: #0b3d91;
       font-weight: bold;
     }
-
     td {
       background-color: #fff;
     }
-
     @media (max-width: 600px) {
       .header {
         height: auto;
@@ -90,12 +80,10 @@
         align-items: center;
         gap: 10px;
       }
-
       .titulo, .botao-container {
         position: static;
         transform: none;
       }
-
       .titulo {
         text-align: center;
         margin-bottom: 10px;
@@ -131,7 +119,7 @@
       apiKey: "AIzaSyCK95vSv4jK0L-eoKC2I6Gev5BjQSL3N7c",
       authDomain: "agendamento-c4753.firebaseapp.com",
       projectId: "agendamento-c4753",
-      storageBucket: "agendamento-c4753.firebasestorage.app",
+      storageBucket: "agendamento-c4753.appspot.com",
       messagingSenderId: "953838698372",
       appId: "1:953838698372:web:f07ca99f1245c97c1ce7d1",
       measurementId: "G-72V3RZG3MF"
@@ -158,35 +146,29 @@
       });
     }
 
-    function escapeCSV(value) {
-      if (value.includes(",") || value.includes(";") || value.includes('"')) {
-        return `"${value.replace(/"/g, '""')}"`;
-      }
-      return value;
-    }
-
-    function downloadCSV() {
-      const rows = [["Responsável", "Aluno", "Turma", "Horário"]];
+    function downloadExcel() {
+      const wb = XLSX.utils.book_new();
+      const ws_data = [["Responsável", "Aluno", "Turma", "Horário"]];
       const trs = document.querySelectorAll("#tabela-agendamentos tbody tr");
+
       trs.forEach(tr => {
-        const cols = tr.querySelectorAll("td");
         const row = [];
-        cols.forEach(td => row.push(escapeCSV(td.textContent)));
-        rows.push(row);
+        tr.querySelectorAll("td").forEach(td => row.push(td.textContent));
+        ws_data.push(row);
       });
 
-      const csvContent = rows.map(e => e.join(";")).join("\n");
-      const utf8BOM = '\uFEFF';
-      const blob = new Blob([utf8BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'agendamentos.csv';
-      a.click();
-      URL.revokeObjectURL(url);
+      const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+      // Define a área de filtro: de A1 até D(Número de linhas)
+      const totalLinhas = ws_data.length;
+      ws['!autofilter'] = { ref: `A1:D${totalLinhas}` };
+
+      XLSX.utils.book_append_sheet(wb, ws, "Agendamentos");
+
+      XLSX.writeFile(wb, "agendamentos.xlsx");
     }
 
-    document.getElementById("btn-download").addEventListener("click", downloadCSV);
+    document.getElementById("btn-download").addEventListener("click", downloadExcel);
 
     carregarAgendamentos();
   </script>
