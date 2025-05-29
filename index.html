@@ -124,7 +124,7 @@
     <tbody></tbody>
   </table>
 
-  <!-- Importação da biblioteca SheetJS para XLSX -->
+  <!-- Biblioteca SheetJS para geração XLSX -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
   <script type="module">
@@ -161,7 +161,6 @@
       });
     }
 
-    // Função que cria a planilha XLSX com filtro na coluna "Turma" (índice 2)
     function downloadXLSX() {
       const table = document.getElementById("tabela-agendamentos");
       const wb = XLSX.utils.book_new();
@@ -169,15 +168,16 @@
       // Converte a tabela HTML para worksheet
       const ws = XLSX.utils.table_to_sheet(table);
 
-      // Aplica autofiltro (filtro automático) na faixa das colunas e linhas da tabela
-      // O range começa na célula A1 e vai até a última célula da tabela
+      // Pega o range total da tabela
       const range = XLSX.utils.decode_range(ws['!ref']);
-      ws['!autofilter'] = { ref: XLSX.utils.encode_range(range) };
+      // Aplica filtro só na coluna "Turma" (coluna C, índice 2), da linha 1 até a última linha
+      const filtroRange = {
+        s: { c: 2, r: 0 },           // coluna C (índice 2), linha 1 (índice 0)
+        e: { c: 2, r: range.e.r }    // coluna C, última linha da tabela
+      };
+      ws['!autofilter'] = { ref: XLSX.utils.encode_range(filtroRange) };
 
-      // Adiciona a worksheet ao workbook
       XLSX.utils.book_append_sheet(wb, ws, "Agendamentos");
-
-      // Gera o arquivo XLSX e dispara o download
       XLSX.writeFile(wb, "agendamentos_filtrado.xlsx");
     }
 
