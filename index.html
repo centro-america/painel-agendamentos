@@ -153,6 +153,13 @@
       return `${h}:${m}`;
     }
 
+    // Converter HH:mm para decimal Excel (hora)
+    function horaParaDecimalExcel(horario) {
+      const [h, m] = horario.split(":").map(Number);
+      if (isNaN(h) || isNaN(m)) return 0;
+      return (h + m / 60) / 24;
+    }
+
     async function carregarAgendamentos() {
       const snapshot = await getDocs(collection(db, "agendamentos"));
       const tbody = document.querySelector("#tabela-agendamentos tbody");
@@ -185,16 +192,15 @@
         })
       };
 
-      // Forçar a coluna "Horário" (índice 3) como texto com apóstrofo
-      for (let row = 1; row <= range.e.r; row++) { // pular header
+      // Ajustar a coluna Horário (índice 3) para valor decimal + formato hh:mm
+      for (let row = 1; row <= range.e.r; row++) {
         const cellAddress = XLSX.utils.encode_cell({ c: 3, r: row });
         const cell = ws[cellAddress];
         if (cell && typeof cell.v === "string") {
-          // Prefixar com apóstrofo para texto literal no Excel
-          if (!cell.v.startsWith("'")) {
-            cell.v = `'${cell.v}`;
-          }
-          cell.t = "s"; // definir tipo string
+          const decimalHora = horaParaDecimalExcel(cell.v);
+          cell.v = decimalHora;
+          cell.t = "n";      // número
+          cell.z = "hh:mm";  // formato hora Excel
         }
       }
 
