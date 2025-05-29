@@ -123,7 +123,7 @@
     <tbody></tbody>
   </table>
 
-  <!-- Biblioteca SheetJS para gerar XLSX -->
+  <!-- Biblioteca SheetJS -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
   <script type="module">
@@ -178,23 +178,28 @@
       const range = XLSX.utils.decode_range(ws['!ref']);
 
       // Aplica filtro só na coluna "Turma" (coluna C, índice 2)
-      const filtroRange = {
-        s: { c: 2, r: 0 },
-        e: { c: 2, r: range.e.r }
+      ws['!autofilter'] = {
+        ref: XLSX.utils.encode_range({
+          s: { c: 2, r: 0 },
+          e: { c: 2, r: range.e.r }
+        })
       };
-      ws['!autofilter'] = { ref: XLSX.utils.encode_range(filtroRange) };
 
-      // Define a coluna "Horário" (índice 3) como texto para evitar formatação automática
-      for (let row = 1; row <= range.e.r; row++) { // começa em 1 para pular cabeçalho
-        const cell_address = XLSX.utils.encode_cell({ c: 3, r: row });
-        if (!ws[cell_address]) continue;
-        ws[cell_address].z = '@'; // força formato texto no Excel
-        // Também força o tipo para string, evitando a conversão numérica
-        ws[cell_address].t = 's';
+      // Forçar a coluna "Horário" (índice 3) como texto com apóstrofo
+      for (let row = 1; row <= range.e.r; row++) { // pular header
+        const cellAddress = XLSX.utils.encode_cell({ c: 3, r: row });
+        const cell = ws[cellAddress];
+        if (cell && typeof cell.v === "string") {
+          // Prefixar com apóstrofo para texto literal no Excel
+          if (!cell.v.startsWith("'")) {
+            cell.v = `'${cell.v}`;
+          }
+          cell.t = "s"; // definir tipo string
+        }
       }
 
       XLSX.utils.book_append_sheet(wb, ws, "Agendamentos");
-      XLSX.writeFile(wb, "agendamentos.xlsx");
+      XLSX.writeFile(wb, "agendamentos_filtrado.xlsx");
     }
 
     document.getElementById("btn-download").addEventListener("click", downloadXLSX);
