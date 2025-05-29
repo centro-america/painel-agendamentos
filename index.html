@@ -143,23 +143,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Função para garantir formato HH:mm com zeros à esquerda
-    function formatarHorario(horario) {
-      if (!horario) return "";
-      const parts = horario.split(":");
-      if (parts.length !== 2) return horario;
-      const h = parts[0].padStart(2, "0");
-      const m = parts[1].padStart(2, "0");
-      return `${h}:${m}`;
-    }
-
-    // Converter HH:mm para decimal Excel (hora)
-    function horaParaDecimalExcel(horario) {
-      const [h, m] = horario.split(":").map(Number);
-      if (isNaN(h) || isNaN(m)) return 0;
-      return (h + m / 60) / 24;
-    }
-
     async function carregarAgendamentos() {
       const snapshot = await getDocs(collection(db, "agendamentos"));
       const tbody = document.querySelector("#tabela-agendamentos tbody");
@@ -168,11 +151,12 @@
       snapshot.forEach(doc => {
         const data = doc.data();
         const tr = document.createElement("tr");
-        tr.innerHTML = 
-          `<td>${data.nome}</td>
-           <td>${data.aluno}</td>
-           <td>${data.turma}</td>
-           <td>${formatarHorario(data.horario)}</td>`;
+        tr.innerHTML = `
+          <td>${data.nome}</td>
+          <td>${data.aluno}</td>
+          <td>${data.turma}</td>
+          <td>${data.horario}</td>
+        `;
         tbody.appendChild(tr);
       });
     }
@@ -182,9 +166,10 @@
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.table_to_sheet(table);
 
+      // Pegando range completo da tabela
       const range = XLSX.utils.decode_range(ws['!ref']);
 
-      // Aplica filtro só na coluna "Turma" (coluna C, índice 2)
+      // Aplicando filtro somente na coluna Turma (índice da coluna: 2)
       ws['!autofilter'] = {
         ref: XLSX.utils.encode_range({
           s: { c: 2, r: 0 },
@@ -192,20 +177,8 @@
         })
       };
 
-      // Ajustar a coluna Horário (índice 3) para valor decimal + formato hh:mm
-      for (let row = 1; row <= range.e.r; row++) {
-        const cellAddress = XLSX.utils.encode_cell({ c: 3, r: row });
-        const cell = ws[cellAddress];
-        if (cell && typeof cell.v === "string") {
-          const decimalHora = horaParaDecimalExcel(cell.v);
-          cell.v = decimalHora;
-          cell.t = "n";      // número
-          cell.z = "hh:mm";  // formato hora Excel
-        }
-      }
-
       XLSX.utils.book_append_sheet(wb, ws, "Agendamentos");
-      XLSX.writeFile(wb, "agendamentos_filtrado.xlsx");
+      XLSX.writeFile(wb, "agendamentos_com_filtro.xlsx");
     }
 
     document.getElementById("btn-download").addEventListener("click", downloadXLSX);
